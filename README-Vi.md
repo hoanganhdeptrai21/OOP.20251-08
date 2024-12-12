@@ -173,5 +173,5 @@ Nếu có xung đột, cần phải giải quyết thủ công.
 5. **Quay lại dễ dàng**: Nếu một commit gây ra các vấn đề nghiêm trọng, việc xác định và đảo ngược các thay đổi trở nên dễ dàng hơn.
 
 ## Kết luận
-Bài thực hành này mình họa một luồng release flow đơn giản sử dụng branch, pull request và versioning. Release flow giúp việc phát triển các tính năng mới, sửa lỗi và phát hành diễn ra theo cách có tổ chức và hiệu quả.
+Bài thực hành này minh họa một luồng release flow đơn giản sử dụng branch, pull request và versioning. Release flow giúp việc phát triển các tính năng mới, sửa lỗi và phát hành diễn ra theo cách có tổ chức và hiệu quả.
 
