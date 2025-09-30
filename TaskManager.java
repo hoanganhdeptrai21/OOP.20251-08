@@ -33,11 +33,25 @@ public class TaskManager {
             }
         }
     }
-
+    private void viewTasks() {
+        if (tasks.isEmpty()) {
+            System.out.println("No tasks available.");
+        } else {
+            System.out.println("\nTasks:");
+            for (int i = 0; i < tasks.size(); i++) {
+                Task task = tasks.get(i);
+                System.out.println((i + 1) + ". " + task.getDescription() + " (Priority: " + task.getPriority() + ")");
+            }
+        }
+    }
     private void addTask() {
         System.out.print("Enter task description: ");
         String description = scanner.nextLine();
-        tasks.add(new Task(description));
+        System.out.print("Enter priority (1: High, 2: Medium, 3: Low): ");
+        int priority = scanner.nextInt();
+        scanner.nextLine(); // Consume newline
+        tasks.add(new Task(description, priority));
         System.out.println("Task added.");
     }
+
 }
