@@ -45,8 +45,15 @@ public class TaskManager {
         }
     }
     private void addTask() {
-        System.out.print("Enter task description: ");
-        String description = scanner.nextLine();
+        String description;
+        do {
+            System.out.print("Enter task description: ");
+            description = scanner.nextLine();
+            if (description.isEmpty()) {
+                System.out.println("Description cannot be empty. Please try again.");
+            }
+        } while (description.isEmpty());
+
         System.out.print("Enter priority (1: High, 2: Medium, 3: Low): ");
         int priority = scanner.nextInt();
         scanner.nextLine(); // Consume newline
