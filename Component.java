@@ -3,6 +3,12 @@ public abstract class Component {
     private double voltage; //V
     private double current; //I
     private boolean isLocked = false;
+    private int rotationDegree = 0;
+
+    public int rotate(){
+        this.rotationDegree = (rotationDegree + 90) % 360;
+        return this.rotationDegree;
+    }
 
     public boolean isLocked(){
         return isLocked;
@@ -30,6 +36,7 @@ public abstract class Component {
     public void setCurrent(double current) {
         this.current = current;
     }
+    public int getRotationDegree() {return rotationDegree;}
     public abstract void calculateAttributes();
     public String toString() {
         return "Name: " + name;

@@ -19,4 +19,8 @@ public class Capacitor extends Component{
 
         prevVoltage = currentVoltage;
     }
+
+    public double getCapacitance() {
+        return capacitance;
+    }
 }
