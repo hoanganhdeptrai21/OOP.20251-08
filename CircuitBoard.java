@@ -1,88 +1,65 @@
 import java.util.ArrayList;
 import java.util.List;
 
-public class CircuitBoard {
-    private int rows;
-    private int cols;
-    private Component[][] grid;
-    private List<Component> toolbox = new ArrayList<>();
+public abstract class CircuitBoard {
+    protected int rows;
+    protected int cols;
+    protected Component[][] grid;
+    protected List<Component> toolbox = new ArrayList<>();
+    protected int maxResistors = -1;
+    protected int maxCapacitors = -1;
 
-    public enum Type {
-        series,
-        parallel
-    }
-
-    private Type type;
-
-    public CircuitBoard(Type type) {
-        this.type = type;
-        switch (type){
-            case series:
-                rows = 3;
-                cols = 7;
-            case parallel:
-                rows = 5;
-                cols = 7;
-            default:
-                rows = 5;
-                cols = 5;
-        }
+    public CircuitBoard(int rows, int cols) {
+        this.rows = rows;
+        this.cols = cols;
         this.grid = new Component[rows][cols];
-        presetComponent(type);
+
+        // Calls the specific implementation in the child class
+        presetComponent();
     }
 
-    private void presetComponent(Type type) {
-        switch (type) {
-            case series:
-                Source src = new Source("Source", 10.0);
-                Destination des = new Destination("Ground");
-                Bulb bulb = new Bulb("Bulb");
-                Capacitor capacitor = new Capacitor("Capacitor", 0.01);
-                src.setLocked();
-                des.setLocked();
-                bulb.setLocked();
-                capacitor.setLocked();
+    protected abstract void presetComponent();
 
-                placeComponent(0, 0, src);
-                placeComponent(2, 6, des);
-                placeComponent(0, 4, bulb);
-                placeComponent(2, 4, capacitor);
+    public abstract double calculateTotalResistance();
 
-                break;
+    public abstract double calculateTotalCapacitance();
 
-            case parallel:
-                Source parallelSrc = new Source("Source", 10.0);
-                Capacitor parallelCapacitor = new Capacitor("Capacitor", 0.01);
-                Bulb parallelBulb = new Bulb("Bulb");
-                parallelSrc.setLocked();
-                parallelCapacitor.setLocked();
-                parallelBulb.setLocked();
-
-
-
+    public boolean canAdd(String type){
+        if(type.equalsIgnoreCase("Wire")) return true;
+        int limit = -1;
+        Class<?> target = null;
+        if(type.equalsIgnoreCase("Resistor")){
+            limit = maxResistors;
+            target = Resistor.class;
         }
+        else if(type.equalsIgnoreCase("Capacitator")){
+            limit = maxCapacitors;
+            target = Capacitor.class;
+        }
+        if(limit == -1) return true;
+        int current = 0;
+        for(int i = 0; i < rows; i++){
+            for(int j = 0; j < cols; j++){
+                if(grid[i][j] != null && target.isInstance(grid[i][j])){
+                    current++;
+                }
+            }
+        }
+        return current < limit;
     }
 
-    public double calculateTotalResistance(){
-
-    }
-
-    private boolean isValid(int row, int col) {
+    protected boolean isValid(int row, int col) {
         return row >= 0 && row < rows && col >= 0 && col < cols;
     }
 
     public Component getComponent(int row, int col) {
-        if (!isValid(row, col)) {
-            return null;
-        }
+        if (!isValid(row, col)) return null;
         return grid[row][col];
     }
 
     public boolean placeComponent(int row, int col, Component component) {
-        if (!isValid(row, col)) {
-            return false;
-        }
-        if (grid[row][col] == null){
+        if (!isValid(row, col)) return false;
+        if (grid[row][col] == null) {
             grid[row][col] = component;
             return true;
         }
@@ -90,17 +67,14 @@ public class CircuitBoard {
     }
 
     public boolean removeComponent(int row, int col) {
-        if (!isValid(row, col)) {
-            return false;
-        }
+        if (!isValid(row, col)) return false;
+
         Component toRemove = grid[row][col];
-        if(toRemove == null){
-            return false;
-        }
-        if(toRemove instanceof Source ||  toRemove instanceof Destination){
-            return false;
-        }
-        toolbox.add(getComponent(row, col));
+        if (toRemove == null) return false;
+
+        if (toRemove.isLocked()) return false; // Checks the locked flag
+
+        toolbox.add(toRemove);
         grid[row][col] = null;
         return true;
     }
@@ -111,7 +85,10 @@ public class CircuitBoard {
                 grid[i][j] = null;
             }
         }
-        // Re-load the level presets after clearing
-        presetComponent(this.difficulty);
+        presetComponent(); // Reloads the specific level preset
     }
+
+    // Getters for GUI if needed
+    public int getRows() { return rows; }
+    public int getCols() { return cols; }
 }
