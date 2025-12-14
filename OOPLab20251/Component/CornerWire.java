@@ -1,3 +1,5 @@
+package OOPLab20251.Component;
+
 public class CornerWire extends Component {
     public CornerWire(String name) {
         super(name);
@@ -5,6 +7,5 @@ public class CornerWire extends Component {
 
     @Override
     public void calculateAttributes() {
-        // Wires generally just pass current through, logic handled by board
     }
 }

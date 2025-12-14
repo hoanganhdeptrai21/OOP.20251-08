@@ -1,3 +1,5 @@
+package OOPLab20251.Component;
+
 public class Capacitor extends Component{
     private double capacitance;
     private double prevVoltage;

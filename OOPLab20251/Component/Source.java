@@ -1,3 +1,5 @@
+package OOPLab20251.Component;
+
 public class Source extends Component {
 
     public Source(String name, double supplyVoltage) {
@@ -7,6 +9,6 @@ public class Source extends Component {
 
     @Override
     public void calculateAttributes() {
-        System.out.println("Source " + getName() + " providing " + getVoltage() + "V");
+        System.out.println("OOPLab20251.Component.Source " + getName() + " providing " + getVoltage() + "V");
     }
 }

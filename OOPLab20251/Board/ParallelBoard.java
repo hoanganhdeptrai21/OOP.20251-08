@@ -1,3 +1,7 @@
+package OOPLab20251.Board;
+
+import OOPLab20251.Component.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,9 +16,9 @@ public class ParallelBoard extends CircuitBoard {
     @Override
     protected void presetComponent() {
 
-        Source parallelSource = new Source("Source", 10.0);
+        Source parallelSource = new Source("OOPLab20251.Component.Source", 10.0);
         Destination parallelDestination = new Destination("Ground");
-        Bulb parallelBulb = new Bulb("Bulb");
+        Bulb parallelBulb = new Bulb("OOPLab20251.Component.Bulb");
         Block parallelBlock1 = new Block("parallelBlock1");
         Block parallelBlock2 = new Block("parallelBlock2");
         Block parallelBlock3 = new Block("parallelBlock3");
@@ -74,10 +78,8 @@ public class ParallelBoard extends CircuitBoard {
         placeComponent(3,5, parallelWire9);
     }
 
-    // --- THE ABSTRACT METHOD IMPLEMENTATION ---
     @Override
     public double calculateTotalResistance() {
-        // 1. Find all resistors on the grid
         List<Resistor> resistors = new ArrayList<>();
 
         for (int r = 0; r < rows; r++) {
@@ -89,15 +91,13 @@ public class ParallelBoard extends CircuitBoard {
             }
         }
 
-        // 2. Handle Edge Cases
         if (resistors.isEmpty()) {
-            return 0.0; // No resistance
+            return 0.0;
         }
         if (resistors.size() == 1) {
-            return resistors.get(0).getResistance(); // Just one resistor
+            return resistors.get(0).getResistance();
         }
 
-        // 3. Parallel Formula: R_total = 1 / ( (1/R1) + (1/R2) + ... )
         double inverseSum = 0.0;
 
         for (Resistor r : resistors) {
@@ -107,7 +107,6 @@ public class ParallelBoard extends CircuitBoard {
             }
         }
 
-        // Avoid division by zero if all resistors were 0
         if (inverseSum == 0) return 0.0;
 
         return 1.0 / inverseSum;

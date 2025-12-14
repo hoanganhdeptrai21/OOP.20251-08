@@ -1,7 +1,9 @@
+package OOPLab20251.Component;
+
 public abstract class Component {
     private String name;
-    private double voltage; //V
-    private double current; //I
+    private double voltage;
+    private double current;
     private boolean isLocked = false;
     private int rotationDegree = 0;
 

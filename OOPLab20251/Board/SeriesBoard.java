@@ -1,3 +1,7 @@
+package OOPLab20251.Board;
+
+import OOPLab20251.Component.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,11 +27,10 @@ public class SeriesBoard extends CircuitBoard {
 
     @Override
     protected void presetComponent() {
-        // Create components
-        Source seriesSource = new Source("Source", 10.0);
+        Source seriesSource = new Source("OOPLab20251.Component.Source", 10.0);
         Destination seriesDestination = new Destination("Ground");
-        Bulb seriesBulb = new Bulb("Bulb");
-        Wire seriesWire1 = new Wire("Wire");
+        Bulb seriesBulb = new Bulb("OOPLab20251.Component.Bulb");
+        Wire seriesWire1 = new Wire("OOPLab20251.Component.Wire");
         Block seriesBlock1 = new Block("seriesBlock1");
         Block seriesBlock2 = new Block("seriesBlock2");
         Block seriesBlock3 = new Block("seriesBlock3");
@@ -37,7 +40,6 @@ public class SeriesBoard extends CircuitBoard {
         Block seriesBlock7 = new Block("seriesBlock7");
         Block seriesBlock8 = new Block("seriesBlock8");
 
-        // Lock them
         seriesSource.setLocked();
         seriesDestination.setLocked();
         seriesBulb.setLocked();
@@ -68,11 +70,9 @@ public class SeriesBoard extends CircuitBoard {
             }
         }
 
-        // 2. Handle Edge Cases
         if (seriesCapacitors.isEmpty()) return 0.0;
         if (seriesCapacitors.size() == 1) return seriesCapacitors.get(0).getCapacitance();
 
-        // 3. Series Formula: 1 / C_total = 1/C1 + 1/C2 + ...
         double inverseSum = 0.0;
         for (Capacitor c : seriesCapacitors) {
             double val = c.getCapacitance();
