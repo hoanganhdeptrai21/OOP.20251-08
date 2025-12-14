@@ -1,3 +1,9 @@
+package OOPLab20251;
+
+import OOPLab20251.Board.CircuitBoard;
+import OOPLab20251.Board.ParallelBoard;
+import OOPLab20251.Board.SeriesBoard;
+import OOPLab20251.Component.*;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -65,10 +71,10 @@ public class CircuitGame extends Application {
         valueInput.setPromptText("Enter value here...");
 
         // --- TOOLBOX ICONS ---
-        // Bulb is REMOVED from here as requested
-        Label iconWire = createDraggableIcon("Wire", Color.BLACK);
-        Label iconResistor = createDraggableIcon("Resistor", Color.ORANGE);
-        Label iconCapacitor = createDraggableIcon("Capacitor", Color.GREEN);
+        // OOPLab20251.Component.Bulb is REMOVED from here as requested
+        Label iconWire = createDraggableIcon("OOPLab20251.Component.Wire", Color.BLACK);
+        Label iconResistor = createDraggableIcon("OOPLab20251.Component.Resistor", Color.ORANGE);
+        Label iconCapacitor = createDraggableIcon("OOPLab20251.Component.Capacitor", Color.GREEN);
 
         Label propHeader = new Label("Properties / Result");
         propHeader.setStyle("-fx-font-weight: bold; -fx-padding: 10 0 0 0;");
@@ -82,7 +88,7 @@ public class CircuitGame extends Application {
                 toolsHeader,
                 valueLabel, valueInput,
                 new Separator(),
-                iconWire, iconResistor, iconCapacitor, // No Bulb here
+                iconWire, iconResistor, iconCapacitor, // No OOPLab20251.Component.Bulb here
                 new Separator(),
                 propHeader, propertiesArea
         );
@@ -169,14 +175,14 @@ public class CircuitGame extends Application {
         sb.append(String.format("Capacitance (C): %.3f F\n", totalCapacitance));
         sb.append("--------------------------\n");
         sb.append(String.format("Time Constant (τ): %.3f s\n", tau));
-        sb.append(String.format("Bulb Duration: %.2f s\n", duration));
+        sb.append(String.format("OOPLab20251.Component.Bulb Duration: %.2f s\n", duration));
 
         // 5. Win Condition (Target 5.0s)
         if (Math.abs(duration - 5.0) < 0.1 && totalResistance > 0) {
             sb.append("\nSUCCESS! Target Reached.");
             isSimulationSuccess = true;
             statusLabel.setText("Success! Circuit Valid.");
-            updateGridDisplay(); // Bulb turns yellow
+            updateGridDisplay(); // OOPLab20251.Component.Bulb turns yellow
 
             Alert winAlert = new Alert(Alert.AlertType.INFORMATION);
             winAlert.setHeaderText("Puzzle Solved!");
@@ -184,12 +190,12 @@ public class CircuitGame extends Application {
             winAlert.show();
         } else {
             isSimulationSuccess = false;
-            if (totalCapacitance == 0) sb.append("\nFAILED. No Capacitor found.");
+            if (totalCapacitance == 0) sb.append("\nFAILED. No OOPLab20251.Component.Capacitor found.");
             else if (totalResistance == 0) sb.append("\nFAILED. Short circuit.");
             else sb.append("\nFAILED. Timing incorrect.");
 
             statusLabel.setText("Simulation Failed.");
-            updateGridDisplay(); // Bulb turns off
+            updateGridDisplay(); // OOPLab20251.Component.Bulb turns off
         }
 
         propertiesArea.setText(sb.toString());
@@ -204,10 +210,10 @@ public class CircuitGame extends Application {
             for(int c=0; c<cols; c++) {
                 Component comp = board.getComponent(r, c);
                 if(comp instanceof Capacitor) {
-                    // Assuming you added getCapacitance() to Capacitor class
+                    // Assuming you added getCapacitance() to OOPLab20251.Component.Capacitor class
                     // If not, we assume the input value is stored in 'voltage' or similar,
-                    // but ideally Capacitor has a dedicated field.
-                    // casting to Capacitor to access getter:
+                    // but ideally OOPLab20251.Component.Capacitor has a dedicated field.
+                    // casting to OOPLab20251.Component.Capacitor to access getter:
                     sum += ((Capacitor)comp).getCapacitance();
                 }
             }
@@ -230,7 +236,7 @@ public class CircuitGame extends Application {
 
         icon.setOnDragDetected(event -> {
             // Validation
-            boolean needsValue = name.equals("Resistor") || name.equals("Capacitor");
+            boolean needsValue = name.equals("OOPLab20251.Component.Resistor") || name.equals("OOPLab20251.Component.Capacitor");
             String valText = valueInput.getText().trim();
 
             if (needsValue) {
@@ -294,7 +300,7 @@ public class CircuitGame extends Application {
                     bg.setFill(Color.DARKGRAY); // Visual for Obstacles
                     bg.setStroke(Color.GRAY);
                 } else if (comp instanceof Bulb) {
-                    // Bulb Visual Logic
+                    // OOPLab20251.Component.Bulb Visual Logic
                     if (isSimulationSuccess) {
                         bg.setFill(Color.YELLOW);
                         bg.setEffect(new javafx.scene.effect.Glow(0.8));
@@ -354,10 +360,10 @@ public class CircuitGame extends Application {
 
         Component newComp = null;
         switch(type) {
-            case "Wire": newComp = new Wire("Wire"); break;
-            case "Resistor": newComp = new Resistor("Resistor", value); break;
-            case "Capacitor": newComp = new Capacitor("Cap", value); break;
-            // Bulb case removed since it is not draggable
+            case "OOPLab20251.Component.Wire": newComp = new Wire("OOPLab20251.Component.Wire"); break;
+            case "OOPLab20251.Component.Resistor": newComp = new Resistor("OOPLab20251.Component.Resistor", value); break;
+            case "OOPLab20251.Component.Capacitor": newComp = new Capacitor("Cap", value); break;
+            // OOPLab20251.Component.Bulb case removed since it is not draggable
         }
 
         if (board.placeComponent(r, c, newComp)) {

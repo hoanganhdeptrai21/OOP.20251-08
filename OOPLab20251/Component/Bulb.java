@@ -1,3 +1,5 @@
+package OOPLab20251.Component;
+
 public class Bulb extends Component {
     private boolean isLit;
 

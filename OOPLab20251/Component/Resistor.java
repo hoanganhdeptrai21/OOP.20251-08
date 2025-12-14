@@ -1,3 +1,5 @@
+package OOPLab20251.Component;
+
 public class Resistor extends Component {
     private double resistance; //R
 

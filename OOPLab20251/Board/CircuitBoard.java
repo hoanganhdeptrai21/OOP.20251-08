@@ -1,3 +1,7 @@
+package OOPLab20251.Board;
+
+import OOPLab20251.Component.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +18,6 @@ public abstract class CircuitBoard {
         this.cols = cols;
         this.grid = new Component[rows][cols];
 
-        // Calls the specific implementation in the child class
         presetComponent();
     }
 
@@ -25,10 +28,10 @@ public abstract class CircuitBoard {
     public abstract double calculateTotalCapacitance();
 
     public boolean canAdd(String type){
-        if(type.equalsIgnoreCase("Wire")) return true;
+        if(type.equalsIgnoreCase("OOPLab20251.Component.Wire")) return true;
         int limit = -1;
         Class<?> target = null;
-        if(type.equalsIgnoreCase("Resistor")){
+        if(type.equalsIgnoreCase("OOPLab20251.Component.Resistor")){
             limit = maxResistors;
             target = Resistor.class;
         }
@@ -59,32 +62,23 @@ public abstract class CircuitBoard {
 
         if (comp instanceof Wire || comp instanceof Resistor || comp instanceof Capacitor) {
             if (rot == 0 || rot == 180) {
-                // Horizontal: Connects Left/Right (dc != 0)
                 return (colDirection != 0 && rowDirection == 0);
             } else {
-                // Vertical: Connects Up/Down (dr != 0)
                 return (rowDirection != 0 && colDirection == 0);
             }
         }
 
-        // --- NEW: CORNER WIRE ---
         if (comp instanceof CornerWire) {
-            // dr, dc is the direction FROM the component TO the neighbor
-
-            if (rot == 0) { // Bottom-Right (└ shape)
-                // Connects if neighbor is Down (dr=1) OR Right (dc=1)
+            if (rot == 0) { // (└ shape)
                 return (rowDirection == 1 && colDirection == 0) || (rowDirection == 0 && colDirection == 1);
             }
-            else if (rot == 90) { // Bottom-Left (┘ shape)
-                // Connects if neighbor is Down (dr=1) OR Left (dc=-1)
+            else if (rot == 90) { //  (┘ shape)
                 return (rowDirection == 1 && colDirection == 0) || (rowDirection == 0 && colDirection == -1);
             }
-            else if (rot == 180) { // Top-Left (┐ shape)
-                // Connects if neighbor is Up (dr=-1) OR Left (dc=-1)
+            else if (rot == 180) { //  (┐ shape)
                 return (rowDirection == -1 && colDirection == 0) || (rowDirection == 0 && colDirection == -1);
             }
-            else if (rot == 270) { // Top-Right (┌ shape)
-                // Connects if neighbor is Up (dr=-1) OR Right (dc=1)
+            else if (rot == 270) { //  (┌ shape)
                 return (rowDirection == -1 && colDirection == 0) || (rowDirection == 0 && colDirection == 1);
             }
         }
@@ -116,8 +110,7 @@ public abstract class CircuitBoard {
         Component toRemove = grid[row][col];
         if (toRemove == null) return false;
 
-        if (toRemove.isLocked()) return false; // Checks the locked flag
-
+        if (toRemove.isLocked()) return false;
         toolbox.add(toRemove);
         grid[row][col] = null;
         return true;
@@ -129,7 +122,7 @@ public abstract class CircuitBoard {
                 grid[i][j] = null;
             }
         }
-        presetComponent(); // Reloads the specific level preset
+        presetComponent();
     }
 
     // Getters for GUI if needed

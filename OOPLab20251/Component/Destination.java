@@ -1,3 +1,5 @@
+package OOPLab20251.Component;
+
 public class Destination extends Component {
 
     public Destination(String name) {
@@ -8,6 +10,6 @@ public class Destination extends Component {
     @Override
     public void calculateAttributes() {
         setVoltage(0.0);
-        System.out.println("Destination " + getName() + " grounded at 0V");
+        System.out.println("OOPLab20251.Component.Destination " + getName() + " grounded at 0V");
     }
 }
