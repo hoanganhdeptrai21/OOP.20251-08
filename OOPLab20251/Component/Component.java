@@ -11,12 +11,9 @@ public abstract class Component {
         this.rotationDegree = (rotationDegree + 90) % 360;
         return this.rotationDegree;
     }
-
-    public boolean isLocked(){
-        return isLocked;
-    }
-    public void setLocked(){
-        this.isLocked = true;
+    public boolean isLocked() {return this.isLocked;}
+    public void setLocked(boolean isLocked) {
+        this.isLocked = isLocked;
     }
     public Component(String name) {
         this.name = name;

@@ -40,10 +40,10 @@ public class SeriesBoard extends CircuitBoard {
         Block seriesBlock7 = new Block("seriesBlock7");
         Block seriesBlock8 = new Block("seriesBlock8");
 
-        seriesSource.setLocked();
-        seriesDestination.setLocked();
-        seriesBulb.setLocked();
-        seriesWire1.setLocked();
+        seriesSource.setLocked(true);
+        seriesDestination.setLocked(true);
+        seriesBulb.setLocked(true);
+        seriesWire1.setLocked(true);
 
         placeComponent(0, 0, seriesSource);
         placeComponent(0, 6, seriesBulb);

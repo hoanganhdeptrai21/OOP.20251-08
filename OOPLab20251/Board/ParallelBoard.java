@@ -40,18 +40,18 @@ public class ParallelBoard extends CircuitBoard {
         Wire parallelWire8 = new Wire("ParallelWire8");
         Wire parallelWire9 = new Wire("ParallelWire9");
 
-        parallelSource.setLocked();
-        parallelDestination.setLocked();
-        parallelBulb.setLocked();
-        parallelWire1.setLocked();
-        parallelWire2.setLocked();
-        parallelWire3.setLocked();
-        parallelWire4.setLocked();
-        parallelWire5.setLocked();
-        parallelWire6.setLocked();
-        parallelWire7.setLocked();
-        parallelWire8.setLocked();
-        parallelWire9.setLocked();
+        parallelSource.setLocked(true);
+        parallelDestination.setLocked(true);
+        parallelBulb.setLocked(true);
+        parallelWire1.setLocked(true);
+        parallelWire2.setLocked(true);
+        parallelWire3.setLocked(true);
+        parallelWire4.setLocked(true);
+        parallelWire5.setLocked(true);
+        parallelWire6.setLocked(true);
+        parallelWire7.setLocked(true);
+        parallelWire8.setLocked(true);
+        parallelWire9.setLocked(true);
 
         placeComponent(2, 0, parallelSource);
         placeComponent(4, 5, parallelDestination);
