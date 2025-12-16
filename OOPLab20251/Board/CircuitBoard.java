@@ -133,17 +133,21 @@ public abstract class CircuitBoard {
         }
 
         if (comp instanceof CornerWire) {
-            if (rot == 0) { // (└ shape)
-                return (rowDirection == 1 && colDirection == 0) || (rowDirection == 0 && colDirection == 1);
+            if (rot == 0) { // Shape: └ (Up & Right)
+                // Up (-1, 0) OR Right (0, 1)
+                return (rowDirection == -1 && colDirection == 0) || (rowDirection == 0 && colDirection == 1);
             }
-            else if (rot == 90) { //  (┘ shape)
+            else if (rot == 90) { // Shape: ┌ (Right & Down)
+                // Right (0, 1) OR Down (1, 0)
+                return (rowDirection == 0 && colDirection == 1) || (rowDirection == 1 && colDirection == 0);
+            }
+            else if (rot == 180) { // Shape: ┐ (Down & Left)
+                // Down (1, 0) OR Left (0, -1)
                 return (rowDirection == 1 && colDirection == 0) || (rowDirection == 0 && colDirection == -1);
             }
-            else if (rot == 180) { //  (┐ shape)
-                return (rowDirection == -1 && colDirection == 0) || (rowDirection == 0 && colDirection == -1);
-            }
-            else if (rot == 270) { //  (┌ shape)
-                return (rowDirection == -1 && colDirection == 0) || (rowDirection == 0 && colDirection == 1);
+            else if (rot == 270) { // Shape: ┘ (Left & Up)
+                // Left (0, -1) OR Up (-1, 0)
+                return (rowDirection == 0 && colDirection == -1) || (rowDirection == -1 && colDirection == 0);
             }
         }
 
