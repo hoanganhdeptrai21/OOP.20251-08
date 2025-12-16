@@ -1,6 +1,7 @@
 package OOPLab20251.Board;
 
 import OOPLab20251.Component.*;
+import OOPLab20251.Utils.ConnectionLogic;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,120 +17,86 @@ public class ParallelBoard extends CircuitBoard {
     @Override
     protected void presetComponent() {
 
-        Source parallelSource = new Source("OOPLab20251.Component.Source", 10.0);
-        Destination parallelDestination = new Destination("Ground");
-        Bulb parallelBulb = new Bulb("OOPLab20251.Component.Bulb");
-        Block parallelBlock1 = new Block("parallelBlock1");
-        Block parallelBlock2 = new Block("parallelBlock2");
-        Block parallelBlock3 = new Block("parallelBlock3");
-        Block parallelBlock4 = new Block("parallelBlock4");
-        Block parallelBlock5 = new Block("parallelBlock5");
-        Block parallelBlock6 = new Block("parallelBlock6");
-        Block parallelBlock7 = new Block("parallelBlock7");
-        Block parallelBlock8 = new Block("parallelBlock8");
-        Block parallelBlock9 = new Block("parallelBlock9");
-        Block parallelBlock10 = new Block("parallelBlock10");
-        Block parallelBlock11= new Block("parallelBlock11");
-        Wire parallelWire1 = new Wire("ParallelWire1");
-        Wire parallelWire2 = new Wire("ParallelWire2");
-        Wire parallelWire3 = new Wire("ParallelWire3");
-        Wire parallelWire4 = new Wire("ParallelWire4");
-        Wire parallelWire5 = new Wire("ParallelWire5");
-        Wire parallelWire6 = new Wire("ParallelWire6");
-        Wire parallelWire7 = new Wire("ParallelWire7");
-        Wire parallelWire8 = new Wire("ParallelWire8");
-        Wire parallelWire9 = new Wire("ParallelWire9");
+        Source Source = new Source("Source", 10.0);
+        Destination Destination = new Destination("Ground");
+        Bulb Bulb = new Bulb("Bulb");
+        Block Block_1 = new Block("Block_1");
+        Block Block_2 = new Block("Block_2");
+        Block Block_3 = new Block("Block_3");
+        Block Block_4 = new Block("Block_4");
+        Block Block_5 = new Block("Block_5");
+        Block Block_6 = new Block("Block_6");
+        Block Block_7 = new Block("Block_7");
+        Block Block_8 = new Block("Block_8");
+        Block Block_9 = new Block("Block_9");
+        Block Block_10 = new Block("Block_10");
+        Block Block_11= new Block("Block_11");
 
-        parallelSource.setLocked();
-        parallelDestination.setLocked();
-        parallelBulb.setLocked();
-        parallelWire1.setLocked();
-        parallelWire2.setLocked();
-        parallelWire3.setLocked();
-        parallelWire4.setLocked();
-        parallelWire5.setLocked();
-        parallelWire6.setLocked();
-        parallelWire7.setLocked();
-        parallelWire8.setLocked();
-        parallelWire9.setLocked();
+        Source.setLocked();
+        Destination.setLocked();
+        Bulb.setLocked();
 
-        placeComponent(2, 0, parallelSource);
-        placeComponent(4, 5, parallelDestination);
-        placeComponent(2, 5, parallelBulb);
-        placeComponent(0, 0, parallelBlock1);
-        placeComponent(1, 0, parallelBlock2);
-        placeComponent(3, 0, parallelBlock3);
-        placeComponent(4, 0, parallelBlock4);
-        placeComponent(1, 2, parallelBlock5);
-        placeComponent(2, 2, parallelBlock6);
-        placeComponent(3, 2, parallelBlock7);
-        placeComponent(1, 4, parallelBlock8);
-        placeComponent(2, 4, parallelBlock9);
-        placeComponent(3, 4, parallelBlock10);
-        placeComponent(4, 4, parallelBlock11);
-        placeComponent(1,1, parallelWire1);
-        placeComponent(2,1, parallelWire2);
-        placeComponent(3,1, parallelWire3);
-        placeComponent(2,3, parallelWire4);
-        placeComponent(3,3, parallelWire5);
-        placeComponent(4,3, parallelWire6);
-        placeComponent(0,4, parallelWire7);
-        placeComponent(1,5, parallelWire8);
-        placeComponent(3,5, parallelWire9);
+        placeComponent(2, 0, Source);
+        placeComponent(4, 5, Destination);
+        placeComponent(2, 5, Bulb);
+        placeComponent(0, 0, Block_1);
+        placeComponent(1, 0, Block_2);
+        placeComponent(3, 0, Block_3);
+        placeComponent(4, 0, Block_4);
+        placeComponent(1, 2, Block_5);
+        placeComponent(2, 2, Block_6);
+        placeComponent(3, 2, Block_7);
+        placeComponent(1, 4, Block_8);
+        placeComponent(2, 4, Block_9);
+        placeComponent(3, 4, Block_10);
+        placeComponent(4, 4, Block_11);
     }
 
     @Override
-    public double calculateTotalResistance() {
+    public double calculateTotalResistance(List<Component> activeComponents) {
         List<Resistor> resistors = new ArrayList<>();
 
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
                 Component comp = getComponent(r, c);
                 if (comp instanceof Resistor) {
-                    resistors.add((Resistor) comp);
+                    // --- THE FIX ---
+                    // Only count if it has flow (In AND Out)
+                    // Disconnected resistors usually have 0 or 1 connection.
+                    if (ConnectionLogic.getFlowCount(this, comp) >= 2) {
+                        resistors.add((Resistor) comp);
+                    }
                 }
             }
         }
 
-        if (resistors.isEmpty()) {
-            return 0.0;
-        }
-        if (resistors.size() == 1) {
-            return resistors.get(0).getResistance();
-        }
+        if (resistors.isEmpty()) return 0.0;
+        if (resistors.size() == 1) return resistors.get(0).getResistance();
 
         double inverseSum = 0.0;
-
         for (Resistor r : resistors) {
             double val = r.getResistance();
-            if (val > 0) {
-                inverseSum += (1.0 / val);
-            }
+            if (val > 0) inverseSum += (1.0 / val);
         }
 
         if (inverseSum == 0) return 0.0;
-
         return 1.0 / inverseSum;
     }
 
-    public double calculateTotalCapacitance() {
-        List<Capacitor> parallelCapacitors = new ArrayList<>();
-
+    @Override
+    public double calculateTotalCapacitance(List<Component> activeComponents) {
+        double sum = 0.0;
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
-                if (grid[r][c] instanceof Capacitor) {
-                    parallelCapacitors.add((Capacitor) grid[r][c]);
+                Component comp = getComponent(r, c);
+                if (comp instanceof Capacitor) {
+                     // --- THE FIX ---
+                    if (ConnectionLogic.getFlowCount(this, comp) >= 2) {
+                        sum += ((Capacitor) comp).getCapacitance();
+                    }
                 }
             }
         }
-
-        if (parallelCapacitors.isEmpty()) return 0.0;
-
-        double sum = 0.0;
-        for (Capacitor c : parallelCapacitors) {
-            sum += c.getCapacitance();
-        }
-
         return sum;
     }
 }

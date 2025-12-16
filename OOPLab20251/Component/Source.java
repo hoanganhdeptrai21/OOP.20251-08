@@ -9,6 +9,6 @@ public class Source extends Component {
 
     @Override
     public void calculateAttributes() {
-        System.out.println("OOPLab20251.Component.Source " + getName() + " providing " + getVoltage() + "V");
+        System.out.println("Source " + getName() + " providing " + getVoltage() + "V");
     }
 }

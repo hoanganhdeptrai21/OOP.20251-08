@@ -1,6 +1,6 @@
 package OOPLab20251.Component;
 
-public class Bulb extends Component {
+public class Bulb extends Component {    // since bulb also has resistance
     private boolean isLit;
 
     public Bulb(String name) {
