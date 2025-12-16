@@ -36,7 +36,7 @@ public abstract class Component {
         this.current = current;
     }
     public int getRotationDegree() {return rotationDegree;}
-    public abstract void calculateAttributes();
+    public void calculateAttributes(){}
     public String toString() {
         return "Name: " + name;
     }

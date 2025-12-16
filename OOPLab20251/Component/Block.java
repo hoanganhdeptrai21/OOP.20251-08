@@ -5,7 +5,4 @@ public class Block extends Component {
         super(name);
         setLocked(true);
     }
-    public void calculateAttributes(){
-        setCurrent(0.0);
-    }
 }

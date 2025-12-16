@@ -6,10 +6,4 @@ public class Destination extends Component {
         super(name);
         this.setVoltage(0.0);
     }
-
-    @Override
-    public void calculateAttributes() {
-        setVoltage(0.0);
-        System.out.println("OOPLab20251.Component.Destination " + getName() + " grounded at 0V");
-    }
 }

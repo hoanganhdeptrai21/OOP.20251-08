@@ -6,8 +6,4 @@ public class Wire extends Component{
         super(name);
     }
 
-    @Override
-    public void calculateAttributes() {
-        setCurrent(0.0);
-    }
 }
