@@ -5,6 +5,7 @@ public abstract class Component {
     private double voltage;
     private double current;
     private boolean isLocked = false;
+    private boolean canRotate = true;
     private int rotationDegree = 0;
 
     public int rotate(){
@@ -38,9 +39,16 @@ public abstract class Component {
     public void setCurrent(double current) {
         this.current = current;
     }
+    public boolean canRotate() {
+        return canRotate;
+    }
+    public void setCanRotate(boolean canRotate) {
+        this.canRotate = canRotate;
+    }
     public int getRotationDegree() {return rotationDegree;}
     public abstract void calculateAttributes();
     public String toString() {
         return "Name: " + name;
     }
+    
 }

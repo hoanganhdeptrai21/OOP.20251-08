@@ -1,6 +1,7 @@
 package OOPLab20251.Board;
 
 import OOPLab20251.Component.*;
+import OOPLab20251.Utils.ConnectionLogic;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,58 +28,67 @@ public class SeriesBoard extends CircuitBoard {
 
     @Override
     protected void presetComponent() {
-        Source seriesSource = new Source("OOPLab20251.Component.Source", 10.0);
-        Destination seriesDestination = new Destination("Ground");
-        Bulb seriesBulb = new Bulb("OOPLab20251.Component.Bulb");
-        Wire seriesWire1 = new Wire("OOPLab20251.Component.Wire");
-        Block seriesBlock1 = new Block("seriesBlock1");
-        Block seriesBlock2 = new Block("seriesBlock2");
-        Block seriesBlock3 = new Block("seriesBlock3");
-        Block seriesBlock4 = new Block("seriesBlock4");
-        Block seriesBlock5 = new Block("seriesBlock5");
-        Block seriesBlock6 = new Block("seriesBlock6");
-        Block seriesBlock7 = new Block("seriesBlock7");
-        Block seriesBlock8 = new Block("seriesBlock8");
+        Source Source = new Source("Source", 10.0);
+        Destination Destination = new Destination("Ground");
+        Bulb Bulb = new Bulb("Bulb");
+        Block Block_1 = new Block("Block_1");
+        Block Block_2 = new Block("Block_2");
+        Block Block_3 = new Block("Block_3");
+        Block Block_4 = new Block("Block_4");
+        Block Block_5 = new Block("Block_5");
+        Block Block_6 = new Block("Block_6");
+        Block Block_7 = new Block("Block_7");
+        Block Block_8 = new Block("Block_8");
 
-        seriesSource.setLocked();
-        seriesDestination.setLocked();
-        seriesBulb.setLocked();
-        seriesWire1.setLocked();
+        Source.setLocked();
+        Destination.setLocked();
+        Bulb.setLocked();
 
-        placeComponent(0, 0, seriesSource);
-        placeComponent(0, 6, seriesBulb);
-        placeComponent(2, 6, seriesDestination);
-        placeComponent(1, 6, seriesWire1);
-        placeComponent(1, 0, seriesBlock1);
-        placeComponent(1, 1, seriesBlock2);
-        placeComponent(2, 0, seriesBlock3);
-        placeComponent(2, 1, seriesBlock4);
-        placeComponent(0, 3, seriesBlock5);
-        placeComponent(1, 3, seriesBlock6);
-        placeComponent(1, 5, seriesBlock7);
-        placeComponent(2, 5, seriesBlock8);
+        placeComponent(0, 0, Source);
+        placeComponent(0, 6, Bulb);
+        placeComponent(2, 6, Destination);
+        placeComponent(1, 0, Block_1);
+        placeComponent(1, 1, Block_2);
+        placeComponent(2, 0, Block_3);
+        placeComponent(2, 1, Block_4);
+        placeComponent(0, 3, Block_5);
+        placeComponent(1, 3, Block_6);
+        placeComponent(1, 5, Block_7);
+        placeComponent(2, 5, Block_8);
     }
 
-    public double calculateTotalCapacitance() {
-        List<Capacitor> seriesCapacitors = new ArrayList<>();
-
-        for (int r = 0; r < rows; r++) {
-            for (int c = 0; c < cols; c++) {
-                if (grid[r][c] instanceof Capacitor) {
-                    seriesCapacitors.add((Capacitor) grid[r][c]);
+    @Override
+    public double calculateTotalResistance(List<Component> activeComponents) {
+        double sum = 0.0;
+        for (int i = 0; i < rows; i++){
+            for(int j = 0; j < cols; j++){
+                Component comp = grid[i][j];
+                if(comp instanceof Resistor){
+                    // --- THE FIX ---
+                    if (ConnectionLogic.getFlowCount(this, comp) >= 2) {
+                        sum += ((Resistor) comp).getResistance();
+                    }
                 }
             }
         }
+        return sum;
+    }
+    @Override
+    public double calculateTotalCapacitance(List<Component> activeComponents) {
+        List<Capacitor> caps = new ArrayList<>();
+        for (Component comp : activeComponents) {
+            if (comp instanceof Capacitor) {
+                caps.add((Capacitor) comp);
+            }
+        }
 
-        if (seriesCapacitors.isEmpty()) return 0.0;
-        if (seriesCapacitors.size() == 1) return seriesCapacitors.get(0).getCapacitance();
+        if (caps.isEmpty()) return 0.0;
+        if (caps.size() == 1) return caps.get(0).getCapacitance();
 
         double inverseSum = 0.0;
-        for (Capacitor c : seriesCapacitors) {
+        for (Capacitor c : caps) {
             double val = c.getCapacitance();
-            if (val > 0) {
-                inverseSum += (1.0 / val);
-            }
+            if (val > 0) inverseSum += (1.0 / val);
         }
 
         if (inverseSum == 0) return 0.0;

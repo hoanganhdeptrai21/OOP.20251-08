@@ -4,6 +4,8 @@ import OOPLab20251.Board.CircuitBoard;
 import OOPLab20251.Board.ParallelBoard;
 import OOPLab20251.Board.SeriesBoard;
 import OOPLab20251.Component.*;
+import OOPLab20251.Utils.ConnectionLogic;
+import OOPLab20251.Utils.GuiUtils;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -17,6 +19,8 @@ import javafx.scene.shape.StrokeType;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
+import javafx.animation.TranslateTransition;
+import javafx.util.Duration;
 
 public class CircuitGame extends Application {
 
@@ -24,7 +28,6 @@ public class CircuitGame extends Application {
     private GridPane gridView;
     private Label statusLabel;
 
-    // UI State
     private TextField valueInput;
     private TextArea propertiesArea;
     private boolean isSimulationSuccess = false;
@@ -33,7 +36,7 @@ public class CircuitGame extends Application {
     public void start(Stage primaryStage) {
         BorderPane root = new BorderPane();
 
-        // --- 1. Top Menu & Toolbar ---
+        // Menu
         MenuBar menuBar = new MenuBar();
         Menu menuGame = new Menu("Game");
         MenuItem itemSelectLevel = new MenuItem("Select Level");
@@ -42,41 +45,41 @@ public class CircuitGame extends Application {
         itemExit.setOnAction(e -> primaryStage.close());
         menuGame.getItems().addAll(itemSelectLevel, new SeparatorMenuItem(), itemExit);
         menuBar.getMenus().add(menuGame);
-
-        HBox toolbar = new HBox(10);
-        toolbar.setPadding(new Insets(10));
-        toolbar.setAlignment(Pos.CENTER_LEFT);
-
+        
         Button btnRun = new Button("▶ Run Circuit");
-        btnRun.setStyle("-fx-background-color: #90ee90; -fx-font-weight: bold;");
+        btnRun.setStyle("-fx-base: #90ee90; -fx-font-weight: bold;");
         btnRun.setOnAction(e -> runCircuitSimulation());
 
         Button btnReset = new Button("↺ Reset Level");
         btnReset.setOnAction(e -> resetLevel());
 
-        toolbar.getChildren().addAll(btnRun, btnReset);
-        root.setTop(new VBox(menuBar, toolbar));
+        ToolBar toolbar = new ToolBar(btnRun, new Separator(), btnReset);
+        
+        VBox topContainer = new VBox(menuBar, toolbar);
+        root.setTop(topContainer);
 
-        // --- 2. Right Sidebar (Toolbox) ---
+        // Toolbox
         VBox sidebar = new VBox(15);
         sidebar.setPadding(new Insets(15));
         sidebar.setStyle("-fx-background-color: #f4f4f4;");
-        sidebar.setPrefWidth(220);
+        sidebar.setMinWidth(200);
 
-        Label toolsHeader = new Label("Toolbox (Drag items)");
+        Label toolsHeader = new Label("Toolbox");
         toolsHeader.setFont(Font.font("Arial", FontWeight.BOLD, 14));
 
         Label valueLabel = new Label("Set Value (Ω or F):");
         valueInput = new TextField();
         valueInput.setPromptText("Enter value here...");
 
-        // --- TOOLBOX ICONS ---
-        // OOPLab20251.Component.Bulb is REMOVED from here as requested
-        Label iconWire = createDraggableIcon("OOPLab20251.Component.Wire", Color.BLACK);
-        Label iconResistor = createDraggableIcon("OOPLab20251.Component.Resistor", Color.ORANGE);
-        Label iconCapacitor = createDraggableIcon("OOPLab20251.Component.Capacitor", Color.GREEN);
+        Label iconWire = createDraggableIcon(ComponentType.WIRE, Color.BLACK);
+        Label iconCorner = createDraggableIcon(ComponentType.CORNER_WIRE, Color.BLACK);
+        iconCorner.setText("Corner");
+        Label iconTWire = createDraggableIcon(ComponentType.T_WIRE, Color.BLACK);
+        iconTWire.setText("T-Junction");
+        Label iconResistor = createDraggableIcon(ComponentType.RESISTOR, Color.ORANGE);
+        Label iconCapacitor = createDraggableIcon(ComponentType.CAPACITOR, Color.GREEN);
 
-        Label propHeader = new Label("Properties / Result");
+        Label propHeader = new Label("Result");
         propHeader.setStyle("-fx-font-weight: bold; -fx-padding: 10 0 0 0;");
         propertiesArea = new TextArea();
         propertiesArea.setEditable(false);
@@ -88,20 +91,28 @@ public class CircuitGame extends Application {
                 toolsHeader,
                 valueLabel, valueInput,
                 new Separator(),
-                iconWire, iconResistor, iconCapacitor, // No OOPLab20251.Component.Bulb here
+                iconWire, iconCorner, iconTWire, iconResistor, iconCapacitor,
                 new Separator(),
                 propHeader, propertiesArea
         );
-        root.setRight(sidebar);
 
-        // --- 3. Center Grid ---
+        // Workspace
         gridView = new GridPane();
         gridView.setAlignment(Pos.CENTER);
         gridView.setHgap(5);
         gridView.setVgap(5);
-        root.setCenter(gridView);
+        
+        ScrollPane gridScroll = new ScrollPane(gridView);
+        gridScroll.setFitToWidth(true);
+        gridScroll.setFitToHeight(true);
+        gridScroll.setStyle("-fx-background-color: transparent;");
 
-        // --- 4. Bottom Status ---
+        SplitPane splitPane = new SplitPane();
+        splitPane.getItems().addAll(gridScroll, sidebar);
+        splitPane.setDividerPositions(0.75);
+        
+        root.setCenter(splitPane);
+
         statusLabel = new Label("Welcome! Select a level to start.");
         statusLabel.setPadding(new Insets(5));
         root.setBottom(statusLabel);
@@ -112,7 +123,7 @@ public class CircuitGame extends Application {
         primaryStage.show();
     }
 
-    // --- GAME LOGIC ---
+    // Logic
 
     private void showLevelSelectDialog() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -155,76 +166,67 @@ public class CircuitGame extends Application {
     private void runCircuitSimulation() {
         if (board == null) return;
 
-        // 1. Get Resistance (Abstract method handles Series vs Parallel math)
-        double totalResistance = board.calculateTotalResistance();
+        // Get valid path
+        java.util.List<Component> activePath = board.getValidPath();
 
-        // 2. Get Capacitance (Sum up all capacitors placed on board)
-        double totalCapacitance = calculateTotalCapacitanceOnBoard();
+        if (activePath == null) {
+            statusLabel.setText("Simulation Failed: Open Circuit!");
+            isSimulationSuccess = false;
+            updateGridDisplay();
+            return;
+        }
 
-        // 3. Calculate Timing
-        // Tau = R * C
+        // Calculate R and C on found path
+        double totalResistance = board.calculateTotalResistance(activePath);
+        double totalCapacitance = board.calculateTotalCapacitance(activePath);
+
         double tau = totalResistance * totalCapacitance;
-
-        // Duration = 5 * Tau
         double duration = 5.0 * tau;
 
-        // 4. Report Results
+        // Report Results
         StringBuilder sb = new StringBuilder();
-        sb.append("--- Simulation Results ---\n");
-        sb.append(String.format("Resistance (R): %.2f Ω\n", totalResistance));
-        sb.append(String.format("Capacitance (C): %.3f F\n", totalCapacitance));
+        sb.append("--- Connected Path Found ---\n");
+        sb.append(String.format("Active Resistance: %.2f Ω\n", totalResistance));
+        sb.append(String.format("Active Capacitance: %.3f F\n", totalCapacitance));
         sb.append("--------------------------\n");
         sb.append(String.format("Time Constant (τ): %.3f s\n", tau));
-        sb.append(String.format("OOPLab20251.Component.Bulb Duration: %.2f s\n", duration));
+        sb.append(String.format("Bulb Duration: %.2f s\n", duration));
 
-        // 5. Win Condition (Target 5.0s)
-        if (Math.abs(duration - 5.0) < 0.1 && totalResistance > 0) {
+        // Win Condition
+        if (Math.abs(duration - 5.0) < 0.1 && totalResistance > 0) {    // Duration around 5 with error <= 0.1 and No short Circuit
             sb.append("\nSUCCESS! Target Reached.");
             isSimulationSuccess = true;
             statusLabel.setText("Success! Circuit Valid.");
-            updateGridDisplay(); // OOPLab20251.Component.Bulb turns yellow
+            
+            for(Component c : activePath){
+                if(c instanceof Bulb) ((Bulb)c).setLit(true);
+            }
 
+            updateGridDisplay();
+            
             Alert winAlert = new Alert(Alert.AlertType.INFORMATION);
             winAlert.setHeaderText("Puzzle Solved!");
             winAlert.setContentText("Great job! The bulb stays lit for 5 seconds.");
             winAlert.show();
         } else {
             isSimulationSuccess = false;
-            if (totalCapacitance == 0) sb.append("\nFAILED. No OOPLab20251.Component.Capacitor found.");
+            if (totalCapacitance == 0) sb.append("\nFAILED. No connected Capacitor.");
             else if (totalResistance == 0) sb.append("\nFAILED. Short circuit.");
             else sb.append("\nFAILED. Timing incorrect.");
 
             statusLabel.setText("Simulation Failed.");
-            updateGridDisplay(); // OOPLab20251.Component.Bulb turns off
+            updateGridDisplay(); 
         }
 
         propertiesArea.setText(sb.toString());
     }
 
-    // Helper to sum capacitors found on the grid
-    private double calculateTotalCapacitanceOnBoard() {
-        double sum = 0.0;
-        int rows = board.getRows();
-        int cols = board.getCols();
-        for(int r=0; r<rows; r++) {
-            for(int c=0; c<cols; c++) {
-                Component comp = board.getComponent(r, c);
-                if(comp instanceof Capacitor) {
-                    // Assuming you added getCapacitance() to OOPLab20251.Component.Capacitor class
-                    // If not, we assume the input value is stored in 'voltage' or similar,
-                    // but ideally OOPLab20251.Component.Capacitor has a dedicated field.
-                    // casting to OOPLab20251.Component.Capacitor to access getter:
-                    sum += ((Capacitor)comp).getCapacitance();
-                }
-            }
-        }
-        return sum;
-    }
-
-    // --- GUI HELPERS ---
-
-    private Label createDraggableIcon(String name, Color color) {
-        Label icon = new Label(name);
+    private Label createDraggableIcon(ComponentType type, Color color) {
+        String rawName = type.name();
+        String displayName = rawName.charAt(0) + rawName.substring(1).toLowerCase().replace('_', ' ');
+        
+        Label icon = new Label(displayName);
+        
         icon.setPadding(new Insets(10));
         icon.setPrefWidth(180);
         icon.setAlignment(Pos.CENTER);
@@ -235,31 +237,37 @@ public class CircuitGame extends Application {
         icon.setGraphic(indicator);
 
         icon.setOnDragDetected(event -> {
-            // Validation
-            boolean needsValue = name.equals("OOPLab20251.Component.Resistor") || name.equals("OOPLab20251.Component.Capacitor");
+            boolean needsValue = (type == ComponentType.RESISTOR || type == ComponentType.CAPACITOR);
             String valText = valueInput.getText().trim();
 
             if (needsValue) {
                 if (valText.isEmpty()) {
-                    statusLabel.setText("Error: Enter a value for " + name + " first!");
+                    statusLabel.setText("Error: Enter a value for " + displayName + " first!");
                     valueInput.requestFocus();
                     event.consume();
                     return;
                 }
-                try {
-                    Double.parseDouble(valText);
-                } catch (NumberFormatException e) {
-                    statusLabel.setText("Error: Invalid number!");
+                if (valText.isEmpty()) {
+                    statusLabel.setText("Error: Enter a value first!");
                     event.consume();
                     return;
                 }
+                try { Double.parseDouble(valText); } 
+                catch (NumberFormatException e) { return; }
             }
 
             Dragboard db = icon.startDragAndDrop(TransferMode.COPY);
             ClipboardContent content = new ClipboardContent();
             if (valText.isEmpty()) valText = "0.0";
-            content.putString(name + ":" + valText);
+            
+            content.putString(type.name() + ":" + valText);
+            
             db.setContent(content);
+
+            javafx.scene.SnapshotParameters snapParams = new javafx.scene.SnapshotParameters();
+            snapParams.setFill(Color.TRANSPARENT);
+            db.setDragView(icon.snapshot(snapParams, null));
+
             event.consume();
         });
 
@@ -273,47 +281,143 @@ public class CircuitGame extends Application {
         int rows = board.getRows();
         int cols = board.getCols();
 
+        // Store cell references for the connection 
+        StackPane[][] cellNodes = new StackPane[rows][cols];
+
+        // Create cells and components in toolbox
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
 
                 StackPane cell = new StackPane();
+                cell.setMinSize(60, 60);
+                cell.setPrefSize(60, 60);
+                cell.setMaxSize(60, 60);
+                
+                StackPane contentContainer = new StackPane();
+                
                 Rectangle bg = new Rectangle(60, 60);
                 bg.setStroke(Color.BLACK);
                 bg.setStrokeType(StrokeType.INSIDE);
-                cell.getChildren().add(bg);
 
                 Component comp = board.getComponent(r, c);
 
                 if (comp == null) {
                     bg.setFill(Color.WHITE);
-                } else if (comp instanceof Source) {
-                    bg.setFill(Color.RED);
-                } else if (comp instanceof Destination) {
-                    bg.setFill(Color.BLUE);
-                } else if (comp instanceof Resistor) {
-                    bg.setFill(Color.ORANGE);
-                } else if (comp instanceof Capacitor) {
-                    bg.setFill(Color.GREEN);
-                } else if (comp instanceof Wire) {
-                    bg.setFill(Color.BLACK);
-                } else if (comp instanceof Block) {
-                    bg.setFill(Color.DARKGRAY); // Visual for Obstacles
-                    bg.setStroke(Color.GRAY);
-                } else if (comp instanceof Bulb) {
-                    // OOPLab20251.Component.Bulb Visual Logic
-                    if (isSimulationSuccess) {
-                        bg.setFill(Color.YELLOW);
-                        bg.setEffect(new javafx.scene.effect.Glow(0.8));
-                    } else {
-                        bg.setFill(Color.DARKKHAKI);
-                        bg.setEffect(null);
+                    contentContainer.getChildren().add(bg);
+                } else {
+                    if (comp instanceof Source) {
+                        bg.setFill(Color.RED);
+                    } else if (comp instanceof Destination) {
+                        bg.setFill(Color.BLUE);
+                    } else if (comp instanceof Resistor) {
+                        bg.setFill(Color.ORANGE);
+                    } else if (comp instanceof Bulb) {
+                        if (isSimulationSuccess) {
+                            bg.setFill(Color.YELLOW);
+                            bg.setEffect(new javafx.scene.effect.Glow(0.8));
+                        } else {
+                            bg.setFill(Color.DARKKHAKI);
+                            bg.setEffect(null);
+                        }
+                    } else if (comp instanceof Capacitor) {
+                        bg.setFill(Color.GREEN);
+                    } else if (comp instanceof Wire || comp instanceof CornerWire || comp instanceof TWire) {
+                        bg.setFill(Color.BLACK);
+                    } else if (comp instanceof Block) {
+                        bg.setFill(Color.DARKGRAY);
+                        bg.setStroke(Color.GRAY);
                     }
+                    
+                    javafx.scene.Node directionNode = null;
+
+                    // Corner wire (L-shaped, no arrow)
+                    if (comp instanceof CornerWire) {
+                        Pane visualPane = new Pane();
+                        visualPane.setPrefSize(60, 60);
+
+                        javafx.scene.shape.Polyline path = new javafx.scene.shape.Polyline(
+                            30.0, 60.0,
+                            30.0, 30.0,
+                            60.0, 30.0
+                        );
+                        path.setStroke(Color.WHITE);
+                        path.setStrokeWidth(4);
+                        path.setStrokeLineCap(javafx.scene.shape.StrokeLineCap.ROUND);
+
+                        visualPane.getChildren().add(path);
+                        visualPane.setOpacity(0.9);
+                        directionNode = visualPane;
+                    } 
+                    // T-Wire (T-shaped, no arrow)
+                    else if (comp instanceof TWire) {
+                         Pane visualPane = new Pane();
+                         visualPane.setPrefSize(60, 60);
+
+                         javafx.scene.shape.Line horz = new javafx.scene.shape.Line(0, 30, 60, 30);
+                         horz.setStroke(Color.WHITE);
+                         horz.setStrokeWidth(4);
+                         horz.setStrokeLineCap(javafx.scene.shape.StrokeLineCap.ROUND);
+
+                         javafx.scene.shape.Line vert = new javafx.scene.shape.Line(30, 30, 30, 60);
+                         vert.setStroke(Color.WHITE);
+                         vert.setStrokeWidth(4);
+                         vert.setStrokeLineCap(javafx.scene.shape.StrokeLineCap.ROUND);
+
+                         visualPane.getChildren().addAll(horz, vert);
+                         visualPane.setOpacity(0.9);
+                         directionNode = visualPane;
+                    }
+                    // Straight Wire (Line, no arrow)
+                    else if (comp instanceof Wire || comp instanceof Resistor || comp instanceof Capacitor) {
+                        javafx.scene.shape.Line line = new javafx.scene.shape.Line(0, 30, 60, 30);
+                        line.setStroke(Color.WHITE);
+                        line.setStrokeWidth(4);
+                        line.setStrokeLineCap(javafx.scene.shape.StrokeLineCap.ROUND);
+                        line.setOpacity(0.9);
+                        directionNode = line;
+                    }
+                    // Source (Arrow for direction since this only has 1 output port)
+                    else if (comp instanceof Source) {
+                        javafx.scene.shape.Polygon arrow = new javafx.scene.shape.Polygon();
+                        arrow.getPoints().addAll(-10.0, -5.0, -10.0, 5.0, 10.0, 0.0);
+                        arrow.setFill(Color.WHITE);
+                        arrow.setOpacity(0.7);
+                        directionNode = arrow;
+                    }
+
+                    if (directionNode != null) {
+                        contentContainer.getChildren().addAll(bg, directionNode);
+                    } else {
+                        contentContainer.getChildren().add(bg);
+                    }
+
+                    // Rotation & Hover mouse for info
+                    contentContainer.setRotate(comp.getRotationDegree());
+
+                    String info = comp.getName(); 
+                    if (comp instanceof Resistor) {
+                        info += "\nResistance: " + ((Resistor)comp).getResistance() + " Ω";
+                    } else if (comp instanceof Capacitor) {
+                        info += "\nCapacitance: " + ((Capacitor)comp).getCapacitance() + " F";
+                    } else if (comp instanceof Bulb) {
+                        info += "\nState: " + (((Bulb)comp).isLit() ? "ON" : "OFF");
+                    } else if (comp instanceof Source) {
+                        info += "\nVoltage: " + ((Source)comp).getVoltage() + " V";
+                    }
+
+                    Tooltip tip = new Tooltip(info);
+                    tip.setStyle("-fx-font-size: 14px; -fx-background-color: #222; -fx-text-fill: white;");
+                    tip.setShowDelay(javafx.util.Duration.millis(50)); 
+                    Tooltip.install(cell, tip);
                 }
 
-                // --- DROP HANDLERS ---
+                cell.getChildren().add(contentContainer);
+
+                // Handle events
                 final int finalR = r;
                 final int finalC = c;
 
+                // Drag
                 cell.setOnDragOver(event -> {
                     if (event.getGestureSource() != cell && event.getDragboard().hasString()) {
                         event.acceptTransferModes(TransferMode.COPY);
@@ -321,53 +425,111 @@ public class CircuitGame extends Application {
                     event.consume();
                 });
 
+                // Drop
                 cell.setOnDragDropped(event -> {
                     Dragboard db = event.getDragboard();
                     boolean success = false;
                     if (db.hasString()) {
                         String[] data = db.getString().split(":");
-                        handleDrop(finalR, finalC, data[0], Double.parseDouble(data[1]));
+                        String type = data[0];
+                        double val = (data.length > 1) ? Double.parseDouble(data[1]) : 0.0;
+                        handleDrop(finalR, finalC, type, val);
                         success = true;
                     }
                     event.setDropCompleted(success);
                     event.consume();
                 });
 
+                // Click (left for rotate, right for remove)
                 cell.setOnMouseClicked(event -> {
                     if (event.getButton() == MouseButton.SECONDARY) {
                         handleRemove(finalR, finalC);
-                    } else if (event.getButton() == MouseButton.PRIMARY && comp != null) {
-                        showComponentProperties(comp);
+                    } 
+                    else if (event.getButton() == MouseButton.PRIMARY && comp != null) {
+                        if (comp.canRotate()) { 
+                            comp.rotate();
+                            updateGridDisplay();
+                        } else {
+                            // Shake effect for non-rotatable items (Blocks)
+                            statusLabel.setText("Cannot rotate this component!");
+                            TranslateTransition shake = new TranslateTransition(Duration.millis(50), cell);
+                            shake.setByX(5); 
+                            shake.setCycleCount(4); 
+                            shake.setAutoReverse(true); 
+                            shake.play();
+                        }
                     }
                 });
 
+                cellNodes[r][c] = cell;
                 gridView.add(cell, c, r);
             }
         }
-    }
 
-    private void handleDrop(int r, int c, String type, double value) {
-        // --- NEW: INVENTORY CHECK ---
-        // Checks if we have reached the Max Limit for this board
+        // Visualize connections
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < cols; c++) {
+                Component current = board.getComponent(r, c);
+                if (current == null) continue;
+
+                // Check right
+                if (c + 1 < cols) {
+                    Component right = board.getComponent(r, c + 1);
+                    if (ConnectionLogic.areConnected(current, right, 1)) {
+                        GuiUtils.addConnectionMarker(cellNodes[r][c], 32, 0);
+                    }
+                }
+
+                // Check bottom
+                if (r + 1 < rows) {
+                    Component bottom = board.getComponent(r + 1, c);
+                    if (ConnectionLogic.areConnected(current, bottom, 2)) {
+                        GuiUtils.addConnectionMarker(cellNodes[r][c], 0, 32);
+                    }
+                }
+            }
+        }
+    }
+    
+    private void handleDrop(int r, int c, String dataString, double value) {
+        ComponentType type;
+        try {
+            type = ComponentType.valueOf(dataString);
+        } catch (IllegalArgumentException e) {
+            System.out.println("Unknown component type: " + dataString);
+            return;
+        }
+
+        // Check component limits
         if (!board.canAdd(type)) {
-            statusLabel.setText("Limit Reached! Max " + type + "(s) used.");
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setHeaderText("Inventory Limit");
-            alert.setContentText("This level limits the number of " + type + "s you can use.");
-            alert.show();
+            statusLabel.setText("Limit Reached for " + type.name());
             return;
         }
 
         Component newComp = null;
+        
         switch(type) {
-            case "OOPLab20251.Component.Wire": newComp = new Wire("OOPLab20251.Component.Wire"); break;
-            case "OOPLab20251.Component.Resistor": newComp = new Resistor("OOPLab20251.Component.Resistor", value); break;
-            case "OOPLab20251.Component.Capacitor": newComp = new Capacitor("Cap", value); break;
-            // OOPLab20251.Component.Bulb case removed since it is not draggable
+            case WIRE:        
+                newComp = new Wire("Wire"); 
+                break;
+            case CORNER_WIRE: 
+                newComp = new CornerWire("Corner"); 
+                break;
+            case T_WIRE:
+                newComp = new TWire("Junction");
+                break;
+            case RESISTOR:    
+                newComp = new Resistor("Resistor", value); 
+                break;
+            case CAPACITOR:   
+                newComp = new Capacitor("Capacitor", value); 
+                break;
+            default:
+                statusLabel.setText("Cannot place " + type.name());
+                return;
         }
-
         if (board.placeComponent(r, c, newComp)) {
-            statusLabel.setText("Placed " + type);
+            statusLabel.setText("Placed " + type.name());
             updateGridDisplay();
         } else {
             statusLabel.setText("Cannot place here!");
@@ -381,17 +543,6 @@ public class CircuitGame extends Application {
         } else {
             statusLabel.setText("Cannot remove! (Locked)");
         }
-    }
-
-    private void showComponentProperties(Component comp) {
-        String msg = "Type: " + comp.getClass().getSimpleName() + "\n";
-        msg += "Name: " + comp.getName() + "\n";
-
-        if (comp instanceof Resistor) msg += "R: " + ((Resistor)comp).getResistance() + " Ω\n";
-        if (comp instanceof Capacitor) msg += "C: " + ((Capacitor)comp).getCapacitance() + " F\n";
-        if (comp.isLocked()) msg += "[LOCKED COMPONENT]";
-
-        propertiesArea.setText(msg);
     }
 
     public static void main(String[] args) {

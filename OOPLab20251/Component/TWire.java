@@ -1,8 +1,7 @@
 package OOPLab20251.Component;
 
-public class Wire extends Component{
-
-    public Wire(String name){
+public class TWire extends Component {
+    public TWire(String name) {
         super(name);
     }
 
