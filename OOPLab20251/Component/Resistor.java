@@ -19,4 +19,8 @@ public class Resistor extends Component {
             setCurrent(calculatedCurrent);
         }
     }
+    public void setResistance(double resistance) {
+        this.resistance = resistance;
+    }
+
 }

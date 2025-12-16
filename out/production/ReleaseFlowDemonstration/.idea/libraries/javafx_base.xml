@@ -1,0 +1,21 @@
+<component name="libraryTable">
+  <library name="javafx.base">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../../../javafx/lib/javafx.base.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../../../javafx/lib/javafx.controls.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../../../javafx/lib/javafx.fxml.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../../../javafx/lib/javafx.graphics.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../../../javafx/lib/javafx.media.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../../../javafx/lib/javafx.swing.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../../../javafx/lib/javafx.web.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../../../javafx/lib/javafx-swt.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../../../javafx/lib/jdk.jsobject.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../../../javafx/lib/jfx.incubator.input.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../../../javafx/lib/jfx.incubator.richtext.jar!/" />
+      <root url="file://$PROJECT_DIR$/../../../../javafx/lib" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+    <jarDirectory url="file://$PROJECT_DIR$/../../../../javafx/lib" recursive="false" />
+  </library>
+</component>
