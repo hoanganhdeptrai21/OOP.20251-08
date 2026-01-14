@@ -1,4 +1,4 @@
-package OOPLab20251.Component;
+package src.Component;
 
 public class Capacitor extends Component{
     private double capacitance;

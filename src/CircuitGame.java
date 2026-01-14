@@ -1,11 +1,11 @@
-package OOPLab20251;
+package src;
 
-import OOPLab20251.Board.CircuitBoard;
-import OOPLab20251.Board.ParallelBoard;
-import OOPLab20251.Board.SeriesBoard;
-import OOPLab20251.Component.*;
-import OOPLab20251.Utils.ConnectionLogic;
-import OOPLab20251.Utils.GuiUtils;
+import src.Board.CircuitBoard;
+import src.Board.ParallelBoard;
+import src.Board.SeriesBoard;
+import src.Component.*;
+import src.Utils.ConnectionLogic;
+import src.Utils.GuiUtils;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;

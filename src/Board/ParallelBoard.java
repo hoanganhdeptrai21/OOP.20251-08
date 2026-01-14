@@ -1,7 +1,7 @@
-package OOPLab20251.Board;
+package src.Board;
 
-import OOPLab20251.Component.*;
-import OOPLab20251.Utils.ConnectionLogic;
+import src.Component.*;
+import src.Utils.ConnectionLogic;
 
 import java.util.ArrayList;
 import java.util.List;

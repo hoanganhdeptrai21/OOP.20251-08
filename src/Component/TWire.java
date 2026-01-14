@@ -1,4 +1,4 @@
-package OOPLab20251.Component;
+package src.Component;
 
 public class TWire extends Component {
     public TWire(String name) {

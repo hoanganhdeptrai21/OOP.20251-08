@@ -1,4 +1,4 @@
-package OOPLab20251.Component;
+package src.Component;
 
 public class CornerWire extends Component {
     public CornerWire(String name) {
