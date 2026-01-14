@@ -1,4 +1,4 @@
-package OOPLab20251;
+package src;
 
 public class AppLauncher {
     public static void main(String[] args) {

@@ -1,4 +1,4 @@
-package OOPLab20251.Component;
+package src.Component;
 
 public class Bulb extends Component {    // since bulb also has resistance
     private boolean isLit;

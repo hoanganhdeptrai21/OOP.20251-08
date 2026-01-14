@@ -1,7 +1,7 @@
-package OOPLab20251.Utils;
+package src.Utils;
 
-import OOPLab20251.Board.CircuitBoard;
-import OOPLab20251.Component.*;
+import src.Board.CircuitBoard;
+import src.Component.*;
 
 public class ConnectionLogic {
 
