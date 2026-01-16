@@ -1,6 +1,6 @@
 package src.Component;
 
-public class Bulb extends Component {    // since bulb also has resistance
+public class Bulb extends Component {
     private boolean isLit;
 
     public Bulb(String name) {
@@ -16,7 +16,6 @@ public class Bulb extends Component {    // since bulb also has resistance
         this.isLit = lit;
     }
 
-    @Override
     public void calculateAttributes() {
         double threshold = 0.0001;
 

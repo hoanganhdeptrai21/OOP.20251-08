@@ -20,21 +20,21 @@ public class ParallelBoard extends CircuitBoard {
         Source Source = new Source("Source", 10.0);
         Destination Destination = new Destination("Ground");
         Bulb Bulb = new Bulb("Bulb");
-        Block Block_1 = new Block("Block_1");
-        Block Block_2 = new Block("Block_2");
-        Block Block_3 = new Block("Block_3");
-        Block Block_4 = new Block("Block_4");
-        Block Block_5 = new Block("Block_5");
-        Block Block_6 = new Block("Block_6");
-        Block Block_7 = new Block("Block_7");
-        Block Block_8 = new Block("Block_8");
-        Block Block_9 = new Block("Block_9");
-        Block Block_10 = new Block("Block_10");
-        Block Block_11= new Block("Block_11");
+        Block Block_1 = new Block("Block");
+        Block Block_2 = new Block("Block");
+        Block Block_3 = new Block("Block");
+        Block Block_4 = new Block("Block");
+        Block Block_5 = new Block("Block");
+        Block Block_6 = new Block("Block");
+        Block Block_7 = new Block("Block");
+        Block Block_8 = new Block("Block");
+        Block Block_9 = new Block("Block");
+        Block Block_10 = new Block("Block");
+        Block Block_11= new Block("Block");
 
-        Source.setLocked();
-        Destination.setLocked();
-        Bulb.setLocked();
+        Source.setLocked(true);
+        Destination.setLocked(true);
+        Bulb.setLocked(true);
 
         placeComponent(2, 0, Source);
         placeComponent(4, 5, Destination);
@@ -60,9 +60,6 @@ public class ParallelBoard extends CircuitBoard {
             for (int c = 0; c < cols; c++) {
                 Component comp = getComponent(r, c);
                 if (comp instanceof Resistor) {
-                    // --- THE FIX ---
-                    // Only count if it has flow (In AND Out)
-                    // Disconnected resistors usually have 0 or 1 connection.
                     if (ConnectionLogic.getFlowCount(this, comp) >= 2) {
                         resistors.add((Resistor) comp);
                     }
@@ -90,7 +87,6 @@ public class ParallelBoard extends CircuitBoard {
             for (int c = 0; c < cols; c++) {
                 Component comp = getComponent(r, c);
                 if (comp instanceof Capacitor) {
-                     // --- THE FIX ---
                     if (ConnectionLogic.getFlowCount(this, comp) >= 2) {
                         sum += ((Capacitor) comp).getCapacitance();
                     }

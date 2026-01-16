@@ -12,7 +12,6 @@ public class Resistor extends Component {
         return resistance;
     }
 
-    @Override
     public void calculateAttributes() {
         if (resistance > 0){
             double calculatedCurrent = getVoltage()/resistance;

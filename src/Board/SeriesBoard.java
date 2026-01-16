@@ -31,18 +31,18 @@ public class SeriesBoard extends CircuitBoard {
         Source Source = new Source("Source", 10.0);
         Destination Destination = new Destination("Ground");
         Bulb Bulb = new Bulb("Bulb");
-        Block Block_1 = new Block("Block_1");
-        Block Block_2 = new Block("Block_2");
-        Block Block_3 = new Block("Block_3");
-        Block Block_4 = new Block("Block_4");
-        Block Block_5 = new Block("Block_5");
-        Block Block_6 = new Block("Block_6");
-        Block Block_7 = new Block("Block_7");
-        Block Block_8 = new Block("Block_8");
+        Block Block_1 = new Block("Block");
+        Block Block_2 = new Block("Block");
+        Block Block_3 = new Block("Block");
+        Block Block_4 = new Block("Block");
+        Block Block_5 = new Block("Block");
+        Block Block_6 = new Block("Block");
+        Block Block_7 = new Block("Block");
+        Block Block_8 = new Block("Block");
 
-        Source.setLocked();
-        Destination.setLocked();
-        Bulb.setLocked();
+        Source.setLocked(true);
+        Destination.setLocked(true);
+        Bulb.setLocked(true);
 
         placeComponent(0, 0, Source);
         placeComponent(0, 6, Bulb);
@@ -64,7 +64,6 @@ public class SeriesBoard extends CircuitBoard {
             for(int j = 0; j < cols; j++){
                 Component comp = grid[i][j];
                 if(comp instanceof Resistor){
-                    // --- THE FIX ---
                     if (ConnectionLogic.getFlowCount(this, comp) >= 2) {
                         sum += ((Resistor) comp).getResistance();
                     }

@@ -4,8 +4,4 @@ public class CornerWire extends Component {
     public CornerWire(String name) {
         super(name);
     }
-
-    @Override
-    public void calculateAttributes() {
-    }
 }

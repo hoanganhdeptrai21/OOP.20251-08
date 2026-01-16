@@ -16,8 +16,8 @@ public abstract class Component {
     public boolean isLocked(){
         return isLocked;
     }
-    public void setLocked(){
-        this.isLocked = true;
+    public void setLocked(boolean locked){
+        this.isLocked = locked;
     }
     public Component(String name) {
         this.name = name;
@@ -46,7 +46,7 @@ public abstract class Component {
         this.canRotate = canRotate;
     }
     public int getRotationDegree() {return rotationDegree;}
-    public abstract void calculateAttributes();
+    
     public String toString() {
         return "Name: " + name;
     }

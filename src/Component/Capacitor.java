@@ -11,7 +11,6 @@ public class Capacitor extends Component{
         this.prevVoltage = 0.0;
     }
 
-    @Override
     public void calculateAttributes() {
         double currentVoltage = getVoltage();
         double dV = currentVoltage - prevVoltage;
