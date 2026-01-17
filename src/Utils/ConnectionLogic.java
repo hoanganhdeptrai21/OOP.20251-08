@@ -41,21 +41,27 @@ public class ConnectionLogic {
         return ports;
     }
 
-    public static boolean areConnected(Component source, Component target, int direction) {
+    public static boolean areConnected(Component source, Component target, int dRow, int dCol) {
         if (source == null || target == null) return false;
 
+        // 1. Determine Source Direction Index (Top, Right, Bottom, Left)
+        int srcDirIndex = -1;
+        if (dRow == -1 && dCol == 0) srcDirIndex = 0;      // Top
+        else if (dRow == 0 && dCol == 1) srcDirIndex = 1;  // Right
+        else if (dRow == 1 && dCol == 0) srcDirIndex = 2;  // Bottom
+        else if (dRow == 0 && dCol == -1) srcDirIndex = 3; // Left
+
+        if (srcDirIndex == -1) return false;
+
+        // 2. Determine Target Direction Index (Opposite Side)
+        int tgtDirIndex = (srcDirIndex + 2) % 4;
+
+        // 3. Check if both components have active ports in the required directions
         boolean[] srcPorts = getActivePorts(source);
         boolean[] tgtPorts = getActivePorts(target);
 
-        if (direction == 1) { // Checking RIGHT neighbor
-            // I need a Right port (1), Neighbor needs a Left port (3)
-            return srcPorts[1] && tgtPorts[3];
-        } 
-        else if (direction == 2) { // Checking BOTTOM neighbor
-            // I need a Bottom port (2), Neighbor needs a Top port (0)
-            return srcPorts[2] && tgtPorts[0];
-        }
-        return false;
+        // 4. Return connection status
+        return srcPorts[srcDirIndex] && tgtPorts[tgtDirIndex];
     }
 
     public static int getFlowCount(CircuitBoard board, Component c) {

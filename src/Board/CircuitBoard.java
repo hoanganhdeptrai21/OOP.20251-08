@@ -88,9 +88,7 @@ public abstract class CircuitBoard {
                 if(isValid(nextRow, nextCol) && !visited[nextRow][nextCol]){
                     Component neighbor = grid[nextRow][nextCol];
 
-                    if(canConnect(currentComponent, rowDirection, colDirection) && 
-                        canConnect(neighbor, -rowDirection, -colDirection)){
-                        
+                    if (ConnectionLogic.areConnected(currentComponent, neighbor, rowDirection, colDirection)) {
                         visited[nextRow][nextCol] = true;
                         queue.add(new Point(nextRow, nextCol));
                         activePath.add(neighbor);
@@ -129,24 +127,6 @@ public abstract class CircuitBoard {
             }
         }
         return current < limit;
-    }
-
-    private boolean canConnect(Component comp, int rowDirection, int colDirection) {
-        if (comp == null || comp instanceof Block) return false;
-
-        // 0=Top, 1=Right, 2=Bottom, 3=Left
-        int directionIndex = -1;
-        
-        if (rowDirection == -1 && colDirection == 0) directionIndex = 0; // Up
-        else if (rowDirection == 0 && colDirection == 1) directionIndex = 1; // Right
-        else if (rowDirection == 1 && colDirection == 0) directionIndex = 2; // Down
-        else if (rowDirection == 0 && colDirection == -1) directionIndex = 3; // Left
-
-        if (directionIndex == -1) return false;
-
-        boolean[] allowedPorts = ConnectionLogic.getActivePorts(comp);
-        
-        return allowedPorts[directionIndex];
     }
 
     protected boolean isValid(int row, int col) {

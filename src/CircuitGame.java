@@ -475,7 +475,7 @@ public class CircuitGame extends Application {
                 // Check right
                 if (c + 1 < cols) {
                     Component right = board.getComponent(r, c + 1);
-                    if (ConnectionLogic.areConnected(current, right, 1)) {
+                    if (ConnectionLogic.areConnected(current, right, 0, 1)) {
                         GuiUtils.addConnectionMarker(cellNodes[r][c], 32, 0);
                     }
                 }
@@ -483,7 +483,7 @@ public class CircuitGame extends Application {
                 // Check bottom
                 if (r + 1 < rows) {
                     Component bottom = board.getComponent(r + 1, c);
-                    if (ConnectionLogic.areConnected(current, bottom, 2)) {
+                    if (ConnectionLogic.areConnected(current, bottom, 1, 0)) {
                         GuiUtils.addConnectionMarker(cellNodes[r][c], 0, 32);
                     }
                 }
