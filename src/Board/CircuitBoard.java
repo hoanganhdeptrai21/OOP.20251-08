@@ -62,7 +62,6 @@ public abstract class CircuitBoard {
         boolean[][] visited = new boolean[rows][cols];
         visited[start.row][start.col] = true;
 
-        // List to store ALL components in the connected circuit
         List<Component> activePath = new ArrayList<>();
         if (grid[start.row][start.col] != null) {
             activePath.add(grid[start.row][start.col]);
@@ -89,13 +88,12 @@ public abstract class CircuitBoard {
                 if(isValid(nextRow, nextCol) && !visited[nextRow][nextCol]){
                     Component neighbor = grid[nextRow][nextCol];
 
-                    // USE CONNECTION LOGIC (Delegated or Local)
                     if(canConnect(currentComponent, rowDirection, colDirection) && 
                         canConnect(neighbor, -rowDirection, -colDirection)){
                         
                         visited[nextRow][nextCol] = true;
                         queue.add(new Point(nextRow, nextCol));
-                        activePath.add(neighbor); // Add to valid list
+                        activePath.add(neighbor);
                     }
                 }
             }
@@ -104,7 +102,7 @@ public abstract class CircuitBoard {
         if (destinationReached) {
             return activePath;
         } else {
-            return null; // Circuit broken
+            return null;
         }
     }
     
@@ -136,7 +134,6 @@ public abstract class CircuitBoard {
     private boolean canConnect(Component comp, int rowDirection, int colDirection) {
         if (comp == null || comp instanceof Block) return false;
 
-        // 1. Convert Grid Direction (rowDir, colDir) to Port Index
         // 0=Top, 1=Right, 2=Bottom, 3=Left
         int directionIndex = -1;
         
@@ -145,10 +142,8 @@ public abstract class CircuitBoard {
         else if (rowDirection == 1 && colDirection == 0) directionIndex = 2; // Down
         else if (rowDirection == 0 && colDirection == -1) directionIndex = 3; // Left
 
-        if (directionIndex == -1) return false; // Should not happen
+        if (directionIndex == -1) return false;
 
-        // 2. Delegate to the Centralized Visual Logic
-        // This ensures the physics ALWAYS matches the visual cyan dots.
         boolean[] allowedPorts = ConnectionLogic.getActivePorts(comp);
         
         return allowedPorts[directionIndex];
@@ -193,7 +188,6 @@ public abstract class CircuitBoard {
         presetComponent();
     }
 
-    // Getters for GUI if needed
     public int getRows() { return rows; }
     public int getCols() { return cols; }
 }

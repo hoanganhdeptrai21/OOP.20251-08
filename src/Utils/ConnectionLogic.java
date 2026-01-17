@@ -5,10 +5,8 @@ import src.Component.*;
 
 public class ConnectionLogic {
 
-    // Helper to determine active ports based on component type and rotation
-    // Returns boolean[] { TOP, RIGHT, BOTTOM, LEFT }
     public static boolean[] getActivePorts(Component c) {
-        boolean[] ports = {false, false, false, false}; // Default: No connections
+        boolean[] ports = {false, false, false, false}; // Top, Right, Bottom, Left, inactive by default
         if (c == null) return ports;
 
         int rot = c.getRotationDegree() % 360;
